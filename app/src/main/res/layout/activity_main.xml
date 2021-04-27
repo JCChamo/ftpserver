@@ -76,4 +76,17 @@
         android:text="CONECTAR"
         android:visibility="invisible"></Button>
 
+    <Button
+        android:id="@+id/displayFilesButton"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/teal_700"
+        android:stateListAnimator="@null"
+        android:textColor="#fff"
+        android:elevation="5dp"
+        android:layout_marginTop="10dp"
+        android:text="MOSTRAR ARCHIVOS"
+        android:visibility="invisible"></Button>
+
 </LinearLayout>
