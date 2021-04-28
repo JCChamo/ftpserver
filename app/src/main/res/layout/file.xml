@@ -32,7 +32,19 @@
             android:textStyle="bold"
             android:textColor="#000"
             android:layout_marginTop="5dp"
-            android:padding="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_gravity="center"></TextView>
+        <TextView
+            android:id="@+id/size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18dp"
+            android:textColor="#000"
+            android:layout_marginTop="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="10dp"
             android:layout_gravity="center"></TextView>
     </LinearLayout>
 

@@ -1,5 +1,6 @@
 package com.example.ftpserver.adapters
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ class FileAdapter (var listener: OnItemClickListener, private var filesList: Arr
     inner class ViewHolder (view : View) : RecyclerView.ViewHolder(view), View.OnClickListener{
 
         val fileName : TextView = view.findViewById(R.id.name)
+        val fileSize : TextView = view.findViewById(R.id.size)
         val fileIcon : ImageView = view.findViewById(R.id.icon)
 
 
@@ -36,7 +38,15 @@ class FileAdapter (var listener: OnItemClickListener, private var filesList: Arr
 
     override fun getItemCount(): Int = filesList.size
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val size : String = if (filesList[position].size / 1000 < 1)
+            "1"
+        else
+            (filesList[position].size / 1000).toString()
+
+        holder.fileSize.text = "$size KB"
+        //size.substringBefore(size.length - 3) + .substring(size.length - 3)
         filesMap.forEach {
             if (filesList[position].name.contains(it.key)){
                 Log.d(":::", it.value)
