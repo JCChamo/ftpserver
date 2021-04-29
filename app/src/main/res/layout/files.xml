@@ -20,6 +20,20 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"></ProgressBar>
 
+    <Button
+        android:id="@+id/pauseButton"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/teal_700"
+        android:stateListAnimator="@null"
+        android:textColor="#fff"
+        android:elevation="5dp"
+        android:layout_marginTop="600dp"
+        android:layout_marginLeft="115dp"
+        android:text="PAUSAR DESCARGA"
+        android:visibility="invisible"></Button>
+
     <ProgressBar
         android:id="@+id/progressbar2"
         android:layout_width="match_parent"
