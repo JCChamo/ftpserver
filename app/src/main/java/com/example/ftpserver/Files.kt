@@ -10,12 +10,14 @@ import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ftpserver.adapters.FileAdapter
 import org.apache.commons.net.ftp.FTP
+import org.apache.commons.net.ftp.FTPFile
 import java.io.*
 
 
@@ -24,10 +26,12 @@ class Files : AppCompatActivity(), FileAdapter.OnItemClickListener{
     lateinit var recyclerView : RecyclerView
     private lateinit var mProgressBar: ProgressBar
     private lateinit var mProgressBar2: ProgressBar
+    private lateinit var textPercentage: TextView
 
     private lateinit var fileAdapter : FileAdapter
     private lateinit var listener: FileAdapter.OnItemClickListener
     private lateinit var context: Context
+    private lateinit var file : FTPFile
     private lateinit var fileName : String
 
     private val REQUEST_EXTERNAL_STORAGE = 1
@@ -44,6 +48,7 @@ class Files : AppCompatActivity(), FileAdapter.OnItemClickListener{
         mProgressBar = findViewById(R.id.progressbar)
         mProgressBar2 = findViewById(R.id.progressbar2)
         recyclerView = findViewById(R.id.recycler)
+        textPercentage = findViewById(R.id.textPercentage)
 
         context = applicationContext
         listener = this
@@ -56,7 +61,8 @@ class Files : AppCompatActivity(), FileAdapter.OnItemClickListener{
     override fun onItemClick(position: Int) {
         verifyStoragePermissions(this)
         Log.d(":::FILE PERMISSIONS", MainActivity.filesList[position].toString().split(" 1")[0])
-        fileName = MainActivity.filesList[position].name.toString()
+        file = MainActivity.filesList[position]
+        fileName = file.name.toString()
         downloadFile()
     }
     private fun downloadFile() {
@@ -70,9 +76,13 @@ class Files : AppCompatActivity(), FileAdapter.OnItemClickListener{
             val absolutePath = getExternalFilesDir(null).toString()
             val downloadFile = File("$absolutePath/$fileName")
             Log.d(":::", "$absolutePath/$fileName")
+            val fileSize = file.size
+            Log.d(":::", fileSize.toString())
             if (!downloadFile.exists()){
                 downloadFile.createNewFile()
                 Log.d(":::", "El archivo no existía, se acaba de crear")
+            } else {
+
             }
             Log.d(":::FILE IS FILE", downloadFile.isFile.toString())
             Log.d(":::FILE EXISTS", downloadFile.exists().toString())
@@ -81,11 +91,10 @@ class Files : AppCompatActivity(), FileAdapter.OnItemClickListener{
                 val fileOutputStream = FileOutputStream(downloadFile, false)
                 val bufferedOutputStream = BufferedOutputStream(fileOutputStream, 1024)
 
-                inputStream.copyTo(bufferedOutputStream)
+                inputStream.inputToFile(bufferedOutputStream, fileSize)
                 ftpClient.completePendingCommand()
 
-                val fileSize = downloadFile.length()
-                Log.d(":::", fileSize.toString())
+                mProgressBar2.max = fileSize.toInt()
 
                 val success = ftpClient.retrieveFile(remoteFile, fileOutputStream)
                 if (success)
@@ -132,9 +141,27 @@ class Files : AppCompatActivity(), FileAdapter.OnItemClickListener{
         }
     }
 
-    private fun setProgress(maxValue: Int, bytesCopied : Long){
-        mProgressBar2.max = maxValue
-        mProgressBar2.visibility = View.VISIBLE
-        mProgressBar2.progress = bytesCopied.toInt()
+    private fun InputStream.inputToFile(out: OutputStream, maxValue : Long, bufferSize: Int = DEFAULT_BUFFER_SIZE){
+        var bytesCopied: Long = 0
+        val buffer = ByteArray(bufferSize)
+        var bytes = read(buffer)
+        runOnUiThread {
+            mProgressBar2.max = maxValue.toInt()
+            mProgressBar2.visibility = View.VISIBLE
+            textPercentage.visibility = View.VISIBLE
+        }
+        while (bytes >= 0) {
+            out.write(buffer, 0, bytes)
+            bytesCopied += bytes
+            bytes = read(buffer)
+            runOnUiThread {
+                mProgressBar2.progress = bytesCopied.toInt()
+                textPercentage.text = String.format("%.1f%%", (bytesCopied.toDouble() / maxValue * 100))
+            }
+        }
+        runOnUiThread {
+            mProgressBar2.visibility = View.INVISIBLE
+            textPercentage.visibility = View.INVISIBLE
+        }
     }
 }

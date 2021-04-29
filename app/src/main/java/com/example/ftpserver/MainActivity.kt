@@ -1,10 +1,9 @@
 package com.example.ftpserver
 
-import android.Manifest
-import android.app.Activity
+import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
 import android.os.Handler
 import android.text.Editable
@@ -14,12 +13,12 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.appcompat.app.AppCompatActivity
 import com.example.ftpserver.adapters.FileAdapter
 import org.apache.commons.net.ftp.FTPClient
 import org.apache.commons.net.ftp.FTPFile
 import java.net.SocketException
+
 
 class MainActivity : AppCompatActivity(), View.OnClickListener, TextWatcher, FileAdapter.OnItemClickListener {
 
@@ -30,6 +29,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, TextWatcher, Fil
     private lateinit var defaultValuesButton: Button
     private lateinit var connectButton: Button
     private lateinit var displayFilesButton: Button
+    private lateinit var mWifi : NetworkInfo
+    private lateinit var connManager : ConnectivityManager
 
     companion object {
         var filesList = arrayOf<FTPFile>()
@@ -50,6 +51,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, TextWatcher, Fil
         connectButton = findViewById(R.id.connectButton)
         displayFilesButton = findViewById(R.id.displayFilesButton)
 
+        connManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)!!
+
         defaultValuesButton.setOnClickListener(this)
         connectButton.setOnClickListener(this)
         displayFilesButton.setOnClickListener(this)
@@ -58,6 +62,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, TextWatcher, Fil
         port.addTextChangedListener(this)
         user.addTextChangedListener(this)
         psswd.addTextChangedListener(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)!!
     }
 
     override fun onClick(p0: View?) {
@@ -69,11 +78,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, TextWatcher, Fil
                 psswd.setText("jones")
             }
             R.id.connectButton -> {
-                connectFtpAndListFiles()
-                Toast.makeText(applicationContext, "CONECTADO", Toast.LENGTH_SHORT).show()
-                Handler().postDelayed({
-                    displayFilesButton.visibility = View.VISIBLE
-                }, 1500)
+                if(mWifi.isConnected) {
+                    connectFtpAndListFiles()
+                    Toast.makeText(applicationContext, "CONECTADO", Toast.LENGTH_SHORT).show()
+                    Handler().postDelayed({
+                        displayFilesButton.visibility = View.VISIBLE
+                    }, 1500)
+                } else
+                    Toast.makeText(applicationContext, "CONÉCTESE AL WIFI", Toast.LENGTH_SHORT).show()
             }
 
             R.id.displayFilesButton -> {

@@ -25,7 +25,19 @@
         android:layout_width="match_parent"
         android:layout_height="20dp"
         android:layout_gravity="center"
-        android:layout_marginTop="500dp"
+        android:layout_marginTop="650dp"
         style="?android:attr/progressBarStyleHorizontal"></ProgressBar>
+
+    <TextView
+        android:id="@+id/textPercentage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:freezesText="true"
+        android:layout_gravity="center"
+        android:visibility="invisible"
+        android:layout_marginTop="700dp"
+        android:layout_marginLeft="190dp"
+        android:text="0%"
+        android:textColor="#000"></TextView>
 
 </RelativeLayout>
